@@ -1,0 +1,33 @@
+- name: Enable ol7 OCI REPO
+  yum_repository:
+    name: ol7_oci_included
+    state: present
+    enabled: yes
+  tags:
+    - "ords"
+
+- name: Install ORDS
+  yum:
+    name:
+     - ords
+  tags:
+    - "ords"
+
+- name: Create ORDS Config Dir
+  file:
+    state: directory
+    path: "/opt/oracle/ords/config/ords/conf"
+    owner: oracle
+    group: oracle
+  tags:
+    - "ords"
+
+- name: Set ORDS Config Dir
+  command: ords configdir /opt/oracle/ords/config/ords/conf
+  environment:
+    JAVA_OPTIONS: "-Xmx512M"
+  become: yes
+  become_user: oracle
+  register: result
+  tags:
+    - "ords"

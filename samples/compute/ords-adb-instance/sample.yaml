@@ -50,27 +50,25 @@
   tasks:
     - block:
       - import_tasks: setup.yaml
-      - tags: 
-        - "setup"
 
-      # - name: Launch an instance
-      #   oci_compute_instance:
-      #     availability_domain: "{{ instance_ad }}"
-      #     compartment_id: "{{ instance_compartment }}"
-      #     name: "my_test_instance"
-      #     image_id: "{{ instance_image }}"
-      #     shape: "{{ instance_shape }}"
-      #     create_vnic_details:
-      #         assign_public_ip: True
-      #         hostname_label: "{{ instance_hostname }}"
-      #         subnet_id: "{{ instance_subnet_id }}"
-      #   register: result
+      - name: Launch an instance
+        oci_compute_instance:
+          availability_domain: "{{ instance_ad }}"
+          compartment_id: "{{ instance_compartment }}"
+          name: "my_test_instance"
+          image_id: "{{ instance_image }}"
+          shape: "{{ instance_shape }}"
+          create_vnic_details:
+              assign_public_ip: True
+              hostname_label: "{{ instance_hostname }}"
+              subnet_id: "{{ instance_subnet_id }}"
+        register: result
 
-      # - name: Print instance details
-      #   debug:
-      #     msg: "Launched a new instance {{ result }}"
+      - name: Print instance details
+        debug:
+          msg: "Launched a new instance {{ result }}"
       - set_fact:
-          instance_id: ocid1.instance.oc1.phx.anyhqljtn572ozycivjrtbty7hzpflcxaibhpzmodfxd44p7ppksehzxgtnq
+          instance_id: "{{result.instance.id }}"
 
       - name: Get the VNIC attachment details of instance
         oci_compute_vnic_attachment_facts:
@@ -160,6 +158,8 @@
           that:
             - stat_result.stat.exists == True
 
-      always:
-        - import_tasks: teardown.yaml
-          ignore_errors: true
+      - import_tasks: ords-setup.yaml
+
+      # always:
+      #   - import_tasks: teardown.yaml
+      #     ignore_errors: true
